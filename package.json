@@ -11,6 +11,7 @@
     "format": "yarn prettier --write ."
   },
   "devDependencies": {
+    "@types/d3": "^7.4.0",
     "@typescript-eslint/eslint-plugin": "^5.38.1",
     "@typescript-eslint/parser": "^5.38.1",
     "eslint": "^8.24.0",
@@ -20,7 +21,7 @@
   },
   "dependencies": {
     "@duckdb/duckdb-wasm": "^1.16.1",
-    "@types/d3": "^7.4.0",
-    "d3": "^7.6.1"
+    "d3": "^7.6.1",
+    "yarn": "^1.22.19"
   }
 }
