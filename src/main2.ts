@@ -14,8 +14,18 @@ const chart = barChart();
 //update the code to sql that get the polluten
 async function update(location: string) {
   // Query DuckDB for the data we want to visualize.
+  await conn.query(
+    `CREATE OR REPLACE VIEW pol AS
+    SELECT * FROM "pittsburgh-air-quality.parquet" WHERE "City" = '${location}'`
+  )
   const data: Table<{ pollutant: Utf8; cnt: Int32 }> = await conn.query(`
-  SELECT 'US AQI' pollutant, count()::INT as cnt from "pittsburgh-air-quality.parquet" WHERE "City" = '${location}'
+  SELECT 'US AQI' as pollutant, count()::INT as cnt from pol
+  UNION ALL
+  SELECT 'PM2.5', count()::INT from pol
+  UNION ALL
+  SELECT 'PM10', count()::INT from pol
+  UNION ALL
+  SELECT 'Ozone', count()::INT from pol
   `);
 
   // Get the X and Y columns for the chart. Instead of using Parquet, DuckDB, and Arrow, we could also load data from CSV or JSON directly.
