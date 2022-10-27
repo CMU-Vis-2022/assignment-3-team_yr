@@ -18,14 +18,31 @@ async function update(location: string) {
     `CREATE OR REPLACE VIEW pol AS
     SELECT * FROM "pittsburgh-air-quality.parquet" WHERE "City" = '${location}'`
   )
+
+  await conn.query(
+    `CREATE OR REPLACE VIEW PM2p5_table AS
+    SELECT "PM2.5" from pol where "PM2.5" < 10`
+  )
+
+  await conn.query(
+    `CREATE OR REPLACE VIEW PM10_table AS
+    SELECT PM10 from pol where PM10 > 0`
+  )
+
+  await conn.query(
+    `CREATE OR REPLACE VIEW Ozone_table AS
+    SELECT Ozone from pol where Ozone > 0`
+  )
+
+
   const data: Table<{ pollutant: Utf8; cnt: Int32 }> = await conn.query(`
   SELECT 'US AQI' as pollutant, count()::INT as cnt from pol
   UNION ALL
-  SELECT 'PM2.5', count()::INT from pol
+  SELECT 'PM2.5', count()::INT from PM2p5_table
   UNION ALL
-  SELECT 'PM10', count()::INT from pol
+  SELECT 'PM10', count()::INT from PM10_table
   UNION ALL
-  SELECT 'Ozone', count()::INT from pol
+  SELECT 'Ozone', count()::INT from Ozone_table
   `);
 
   // Get the X and Y columns for the chart. Instead of using Parquet, DuckDB, and Arrow, we could also load data from CSV or JSON directly.
